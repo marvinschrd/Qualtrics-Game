@@ -11,12 +11,16 @@ public class TrashCan : MonoBehaviour
     [SerializeField] float movingSpeed;
 
     private float currentSpeed;
-    
+
+    [SerializeField] private float maxSpeed;
+
+    private GameManager _gameManager;
     
     // Start is called before the first frame update
     void Start()
     {
         body = GetComponent<Rigidbody2D>();
+        _gameManager = FindObjectOfType<GameManager>();
     }
 
     private void FixedUpdate()
@@ -62,6 +66,27 @@ public class TrashCan : MonoBehaviour
         //     // body.position = new Vector2(body.position.x - 1 * movingSpeed, body.position.y);
         // }
         currentSpeed += Input.GetAxis("Horizontal");
-        Debug.Log(currentSpeed);
+        if (body.velocity.x >= maxSpeed)
+        {
+            body.velocity = new Vector2(maxSpeed, body.velocity.y);
+        }
+
+        if (body.velocity.x<= -maxSpeed)
+        {
+            body.velocity = new Vector2(-maxSpeed, body.velocity.y);
+        }
+        //Debug.Log(body.velocity.x);
+        
+        
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("GoodObject"))
+        {
+            Debug.Log("got it");
+            _gameManager.AddScore(1);
+        }
+        Destroy(other.gameObject,0.3f);
     }
 }
