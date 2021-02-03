@@ -80,13 +80,27 @@ public class TrashCan : MonoBehaviour
         
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("GoodObject"))
         {
             Debug.Log("got it");
             _gameManager.AddScore(1);
         }
+        else
+        {
+            _gameManager.SubScore(1);
+        }
         Destroy(other.gameObject,0.3f);
     }
+
+    // private void OnCollisionEnter2D(Collision2D other)
+    // {
+    //     if (other.gameObject.CompareTag("GoodObject"))
+    //     {
+    //         Debug.Log("got it");
+    //         _gameManager.AddScore(1);
+    //     }
+    //     Destroy(other.gameObject,0.3f);
+    // }
 }

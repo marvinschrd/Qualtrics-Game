@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,6 +13,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject playingPanel;
 
     [SerializeField] TextMeshProUGUI scoreText;
+
+    [SerializeField] private GameObject prefabCross;
+    [SerializeField] private GameObject prefabCheckMark;
+    
+    private ScreenShaker shaker;
     struct PlayerData
     {
        public int PlayerID;
@@ -35,6 +41,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         playerData.playerScore = 0;
+        shaker = FindObjectOfType<ScreenShaker>();
     }
 
     // Update is called once per frame
@@ -58,6 +65,16 @@ public class GameManager : MonoBehaviour
     public void AddScore(int point)
     {
         playerData.playerScore += point;
+        GameObject checkMark = Instantiate(prefabCheckMark, new Vector3(0, 0, 0), quaternion.identity);
+        Destroy(checkMark,1);
+    }
+
+    public void SubScore(int point)
+    {
+        playerData.playerScore -= point;
+        GameObject cross = Instantiate(prefabCross, new Vector3(0, 0, 0), quaternion.identity);
+        shaker.TriggerShake(0.8f);
+        Destroy(cross,1);
     }
     
 }
