@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject prefabCheckMark;
     
     private ScreenShaker shaker;
+    private WebSocketDemo socket;
     struct PlayerData
     {
        public int PlayerID;
@@ -42,6 +43,7 @@ public class GameManager : MonoBehaviour
     {
         playerData.playerScore = 0;
         shaker = FindObjectOfType<ScreenShaker>();
+        socket = FindObjectOfType<WebSocketDemo>();
     }
 
     // Update is called once per frame
@@ -60,6 +62,10 @@ public class GameManager : MonoBehaviour
         }
 
         scoreText.text = playerData.playerScore.ToString();
+        if (playerData.playerScore != 0)
+        {
+            SaveToJson();
+        }
     }
 
     public void AddScore(int point)
@@ -76,5 +82,10 @@ public class GameManager : MonoBehaviour
         shaker.TriggerShake(0.8f);
         Destroy(cross,1);
     }
-    
+
+    public void SaveToJson()
+    {
+        string data = JsonUtility.ToJson(playerData, true);
+        socket.SendUserData(data);
+    }
 }

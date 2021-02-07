@@ -6,14 +6,14 @@ using UnityEngine;
 // Use plugin namespace
 using HybridWebSocket;
 
-public class WebSocketDemo : MonoBehaviour {
-
+public class WebSocketDemo : MonoBehaviour
+{
+    private WebSocket ws;
 	// Use this for initialization
 	void Start () {
 
         // Create WebSocket instance
-        WebSocket ws = WebSocketFactory.CreateInstance("ws://echo.websocket.org");
-
+        ws = WebSocketFactory.CreateInstance("ws://localhost:9000/echo");
         // Add OnOpen event listener
         ws.OnOpen += () =>
         {
@@ -28,7 +28,7 @@ public class WebSocketDemo : MonoBehaviour {
         {
             Debug.Log("WS received message: " + Encoding.UTF8.GetString(msg));
 
-            ws.Close();
+           // ws.Close();
         };
 
         // Add OnError event listener
@@ -46,6 +46,11 @@ public class WebSocketDemo : MonoBehaviour {
         // Connect to the server
         ws.Connect();
 
+    }
+
+    public void SendUserData(string dataJson)
+    {
+        ws.Send(Encoding.UTF8.GetBytes(dataJson));
     }
 	
 	// Update is called once per frame
