@@ -32,6 +32,6 @@ public class DropZone : MonoBehaviour
             _gameManager.SubScore(1);
         }
         
-        Destroy(fire,1.5f);
+        Destroy(fire,0.4f);
     }
 }
