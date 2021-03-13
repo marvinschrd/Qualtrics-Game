@@ -46,6 +46,16 @@ public class TrashCan : MonoBehaviour
             currentSpeed = body.velocity.x;
         }
         
+        if (body.velocity.x >= maxSpeed)
+        {
+            body.velocity = new Vector2(maxSpeed, body.velocity.y);
+        }
+
+        if (body.velocity.x<= -maxSpeed)
+        {
+            body.velocity = new Vector2(-maxSpeed, body.velocity.y);
+        }
+        
         //body.position = body.velocity;
     }
 
@@ -66,18 +76,18 @@ public class TrashCan : MonoBehaviour
         //     // body.position = new Vector2(body.position.x - 1 * movingSpeed, body.position.y);
         // }
         currentSpeed += Input.GetAxis("Horizontal");
-        if (body.velocity.x >= maxSpeed)
+        
+        Debug.Log(body.velocity.x);
+
+        if (transform.position.x < -10.0f && body.velocity.x < 0)
         {
-            body.velocity = new Vector2(maxSpeed, body.velocity.y);
+            body.position = new Vector2(10.0f, body.position.y);
+        }
+        if (transform.position.x > 10.0f && body.velocity.x > 0)
+        {
+            body.position = new Vector2(-10.0f, body.position.y);
         }
 
-        if (body.velocity.x<= -maxSpeed)
-        {
-            body.velocity = new Vector2(-maxSpeed, body.velocity.y);
-        }
-        //Debug.Log(body.velocity.x);
-        
-        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -93,6 +103,8 @@ public class TrashCan : MonoBehaviour
         }
         Destroy(other.gameObject,0.3f);
     }
+
+   
 
     // private void OnCollisionEnter2D(Collision2D other)
     // {

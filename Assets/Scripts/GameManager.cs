@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using HybridWebSocket;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -19,13 +20,19 @@ public class GameManager : MonoBehaviour
     
     private ScreenShaker shaker;
     private WebSocketDemo socket;
-    struct PlayerData
+
+    [SerializeField] private TMP_InputField ID;
+    private float timePlayed = 0f;
+
+    bool isInitialized = false;
+    private float initializeWaitTime = 1.0f;
+    public struct PlayerData
     {
-       public int PlayerID;
+       public string PlayerID;
        public int playerScore;
        public int objectMissed;
        public int wrongObjectCatched;
-       public float timePlayed;
+       public string timePlayed;
     }
     PlayerData playerData;
     // Start is called before the first frame update
@@ -34,7 +41,8 @@ public class GameManager : MonoBehaviour
     {
         MAINMENU,
         PLAYING,
-        PAUSED,
+        INITIALIZESOCKET,
+        SENDDATA,
         END
     }
 
@@ -52,19 +60,46 @@ public class GameManager : MonoBehaviour
         switch (state)
         {
             case State.MAINMENU:
+                Time.timeScale = 0f;
                 break;
             case State.PLAYING:
+                menuPanel.SetActive(false);
+                timePlayed += Time.deltaTime;
+                playerData.PlayerID = ID.text;
+                //Debug.Log("text = " +ID.text);
+                Time.timeScale = 1f;
                 break;
-            case State.PAUSED:
+            case State.INITIALIZESOCKET:
+                playerData.timePlayed = timePlayed.ToString() + " secondes";
+                if (!isInitialized)
+                {
+                    socket.Initialize();  
+                }
+                    Debug.Log("initilized");
+                isInitialized = true;
+                initializeWaitTime -= Time.deltaTime;
+                if (initializeWaitTime <= 0)
+                {
+                    state = State.SENDDATA;
+                }
+                break;
+            case  State.SENDDATA:
+                Time.timeScale = 0f;
+                SaveToJson();
                 break;
             case State.END:
+                Debug.Log("ended");
                 break;
         }
 
+        if (playerData.playerScore < 0)
+        {
+            playerData.playerScore = 0;
+        }
         scoreText.text = playerData.playerScore.ToString();
         if (playerData.playerScore != 0)
         {
-            SaveToJson();
+           // SaveToJson();
         }
     }
 
@@ -85,7 +120,29 @@ public class GameManager : MonoBehaviour
 
     public void SaveToJson()
     {
-        string data = JsonUtility.ToJson(playerData, true);
-        socket.SendUserData(data);
+        Debug.Log("socket state = " + socket.GetSocketState());
+        if (socket.GetSocketState() == WebSocketState.Open)
+        {
+            string data = JsonUtility.ToJson(playerData, true);
+            socket.SendUserData(data);
+            Debug.Log("sent");
+            state = State.END;
+        }
+    }
+
+    public void SetPlaying()
+    {
+        state = State.PLAYING;
+    }
+
+    // public void SetPause()
+    // {
+    //     state = State.PAUSED;
+    // }
+    
+    
+    public void SetEnd()
+    {
+        state = State.INITIALIZESOCKET;
     }
 }
